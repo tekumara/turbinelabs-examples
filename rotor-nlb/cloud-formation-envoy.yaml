@@ -14,12 +14,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Run Envoy in an autoscaling group behind an NLB
 Parameters:
-  AwsAccessKeyId:
-    Type: String
-    Description: AWS Access Key to use for inspecting EC2 instances
-  AwsSecretAccessKey:
-    Type: String
-    Description: AWS Secret Access Key to use for inspecting EC2 instances
   VpcId:
     Type: 'AWS::EC2::VPC::Id'
     Description: VpcId of your existing Virtual Private Cloud (VPC)
@@ -568,6 +562,40 @@ Resources:
           CidrIp: !Ref SSHLocation
       VpcId: !Ref VpcId
 
+  RotorRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'ec2.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+      - PolicyName: 'DescribeResources'
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: 'ec2:DescribeInstances'
+            Resource: '*'
+          - Effect: Allow
+            Action: 'ecs:Describe*'
+            Resource: '*'
+          - Effect: Allow
+            Action: 'ecs:List*'
+            Resource: '*'
+  RotorInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: '/'
+      Roles:
+      - !Ref RotorRole
+
   Rotor:
     Type: 'AWS::EC2::Instance'
     Description: 'Turbine Labs service discovery agent'
@@ -589,6 +617,7 @@ Resources:
           - Arch
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref RotorInstanceProfile
       UserData: !Base64
         'Fn::Join':
           - ''
@@ -614,10 +643,6 @@ Resources:
                       ExecStartPre=/usr/bin/docker pull turbinelabs/rotor:0.18.2
             - '        ExecStart=/usr/bin/docker run --name %n -e "ROTOR_AWS_AWS_REGION='
             - !Ref 'AWS::Region'
-            - '" -e "ROTOR_AWS_AWS_ACCESS_KEY_ID='
-            - !Ref AwsAccessKeyId
-            - '" -e "ROTOR_AWS_AWS_SECRET_ACCESS_KEY='
-            - !Ref AwsSecretAccessKey
             - '" -e "ROTOR_AWS_VPC_ID='
             - !Ref VpcId
             - '" -e "ROTOR_CMD=aws" -p 50000:50000 turbinelabs/rotor:0.18.2'

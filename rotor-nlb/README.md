@@ -54,8 +54,7 @@ Before getting started you'll need the following:
 
 You can [sign up for an account](https://aws.amazon.com/) if you don't have
 one. You'll need permissions to create VPCs, NLBs, EC2 instances, and
-autoscaling groups. You'll also need
-[an access key](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html).
+autoscaling groups.
 
 ## A VPC ##
 
