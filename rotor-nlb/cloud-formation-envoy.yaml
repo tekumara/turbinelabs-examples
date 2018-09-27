@@ -359,6 +359,10 @@ Resources:
       LaunchConfigurationName: !Ref EnvoyLaunchConfig
       MinSize: '2'
       MaxSize: '4'
+      Tags:
+      - Key: 'Name'
+        Value: 'envoy'
+        PropagateAtLaunch: true
       TargetGroupARNs:
         - !Ref LBTargetGroup
 
@@ -618,6 +622,9 @@ Resources:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
       IamInstanceProfile: !Ref RotorInstanceProfile
+      Tags:
+      - Key: 'Name'
+        Value: 'rotor'
       UserData: !Base64
         'Fn::Join':
           - ''

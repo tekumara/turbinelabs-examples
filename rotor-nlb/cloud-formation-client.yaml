@@ -369,6 +369,9 @@ Resources:
         - Key: 'tbn:cluster:client:8080:stage'
           Value: 'prod'
           PropagateAtLaunch: true
+        - Key: 'Name'
+          Value: 'client'
+          PropagateAtLaunch: true
 
   AllInOneClientScaleOutPolicy:
     Type : "AWS::AutoScaling::ScalingPolicy"

@@ -370,6 +370,9 @@ Resources:
         - Key: 'tbn:cluster:server:8080:stage'
           Value: 'prod'
           PropagateAtLaunch: true
+        - Key: 'Name'
+          Value: 'server'
+          PropagateAtLaunch: true
 
   AllInOneServerScaleOutPolicy:
     Type : "AWS::AutoScaling::ScalingPolicy"
